@@ -69,22 +69,43 @@ import java.sql.Timestamp;
         }
     }
 
-    public boolean updateTicket(Ticket ticket) {
+    public int getNbTicket(Ticket ticket) {
 <span class="nc" id="L73">        Connection con = null;</span>
+<span class="nc" id="L74">        int ticketCount = 0;</span>
         try {
-<span class="nc" id="L75">            con = dataBaseConfig.getConnection();</span>
-<span class="nc" id="L76">            PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET);</span>
-<span class="nc" id="L77">            ps.setDouble(1, ticket.getPrice());</span>
-<span class="nc" id="L78">            ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));</span>
-<span class="nc" id="L79">            ps.setInt(3,ticket.getId());</span>
-<span class="nc" id="L80">            ps.execute();</span>
-<span class="nc" id="L81">            return true;</span>
-<span class="nc" id="L82">        }catch (Exception ex){</span>
-<span class="nc" id="L83">            logger.error(&quot;Error saving ticket info&quot;,ex);</span>
-        }finally {
-<span class="nc" id="L85">            dataBaseConfig.closeConnection(con);</span>
+<span class="nc" id="L76">            con = dataBaseConfig.getConnection();</span>
+<span class="nc" id="L77">            PreparedStatement ps = con.prepareStatement(DBConstants.GET_NUMBER_OF_TICKET_PER_VEHICLE);</span>
+<span class="nc" id="L78">            ps.setString(1, ticket.getVehicleRegNumber());</span>
+<span class="nc" id="L79">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L81">                ticketCount = rs.getInt(1);</span>
+            }
+<span class="nc" id="L83">            dataBaseConfig.closeResultSet(rs);</span>
+<span class="nc" id="L84">            dataBaseConfig.closePreparedStatement(ps);</span>
+<span class="nc" id="L85">        } catch (Exception ex) {</span>
+<span class="nc" id="L86">            logger.error(&quot;Error counting tickets for vehicle: {}&quot;, ticket.getVehicleRegNumber(), ex);</span>
+        } finally {
+<span class="nc" id="L88">            dataBaseConfig.closeConnection(con);</span>
         }
-<span class="nc" id="L87">        return false;</span>
+<span class="nc" id="L90">        return ticketCount;</span>
+    }
+
+    public boolean updateTicket(Ticket ticket) {
+<span class="nc" id="L94">        Connection con = null;</span>
+        try {
+<span class="nc" id="L96">            con = dataBaseConfig.getConnection();</span>
+<span class="nc" id="L97">            PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TICKET);</span>
+<span class="nc" id="L98">            ps.setDouble(1, ticket.getPrice());</span>
+<span class="nc" id="L99">            ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));</span>
+<span class="nc" id="L100">            ps.setInt(3,ticket.getId());</span>
+<span class="nc" id="L101">            ps.execute();</span>
+<span class="nc" id="L102">            return true;</span>
+<span class="nc" id="L103">        }catch (Exception ex){</span>
+<span class="nc" id="L104">            logger.error(&quot;Error saving ticket info&quot;,ex);</span>
+        }finally {
+<span class="nc" id="L106">            dataBaseConfig.closeConnection(con);</span>
+        }
+<span class="nc" id="L108">        return false;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
